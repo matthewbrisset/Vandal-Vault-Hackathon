@@ -1,0 +1,771 @@
+  :root {
+      --bg: #0a0d0f;
+      --surface: #111518;
+      --surface2: #181d22;
+      --border: #1f2830;
+      --accent: #c8ff57;
+      --accent2: #ff6b35;
+      --accent3: #57c8ff;
+      --text: #e8edf2;
+      --text-muted: #6b7c8a;
+      --text-dim: #3a4a58;
+      --score-low: #ff4444;
+      --score-mid: #ffaa00;
+      --score-good: #57ff99;
+      --score-great: #c8ff57;
+      --radius: 12px;
+    }
+ 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+ 
+    /* ─── NOISE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+ 
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 60px;
+      background: rgba(10,13,15,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+ 
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+    }
+ 
+    .nav-logo span { color: var(--text-muted); font-style: italic; }
+ 
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+ 
+    .nav-links a {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+ 
+    .nav-links a:hover { color: var(--accent); }
+ 
+    .nav-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+ 
+    /* ─── LAYOUT ─── */
+    .page { max-width: 1200px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
+ 
+    /* ─── HERO ─── */
+    .hero {
+      padding: 5rem 0 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+ 
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+ 
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+    }
+ 
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 4rem;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+ 
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+ 
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      max-width: 420px;
+    }
+ 
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+ 
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+ 
+    .btn-primary {
+      background: var(--accent);
+      color: #0a0d0f;
+    }
+ 
+    .btn-primary:hover { background: #d9ff6e; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(200,255,87,0.25); }
+ 
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+ 
+    .btn-outline:hover { border-color: var(--text-muted); background: var(--surface); }
+ 
+    /* ─── SCORE GAUGE (Hero Right) ─── */
+    .score-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+ 
+    .score-card::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(200,255,87,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+ 
+    .score-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+ 
+    .score-number {
+      font-family: 'DM Serif Display', serif;
+      font-size: 5rem;
+      line-height: 1;
+      color: var(--accent);
+      letter-spacing: -0.04em;
+    }
+ 
+    .score-max {
+      font-size: 1.5rem;
+      color: var(--text-dim);
+    }
+ 
+    .score-tier {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+      padding: 4px 12px;
+      background: rgba(200,255,87,0.1);
+      border: 1px solid rgba(200,255,87,0.2);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+ 
+    .score-bar-wrap {
+      margin-top: 1.5rem;
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+ 
+    .score-bar-fill {
+      height: 100%;
+      width: 73%;
+      background: linear-gradient(90deg, var(--score-low), var(--score-mid), var(--score-good), var(--accent));
+      border-radius: 100px;
+      position: relative;
+    }
+ 
+    .score-range-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+    }
+ 
+    .score-delta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+    }
+ 
+    .delta-up { color: var(--accent); }
+    .delta-label { color: var(--text-muted); }
+ 
+    .score-factors {
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+ 
+    .factor {
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 0.75rem;
+    }
+ 
+    .factor-name {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+      font-family: 'DM Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+ 
+    .factor-bar-wrap { height: 4px; background: var(--border); border-radius: 100px; overflow: hidden; }
+    .factor-bar { height: 100%; border-radius: 100px; }
+ 
+    /* ─── SECTION HEADERS ─── */
+    .section { padding: 4rem 0; }
+ 
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+ 
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      letter-spacing: -0.02em;
+    }
+ 
+    .section-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+ 
+    /* ─── CSV UPLOAD ─── */
+    .upload-zone {
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 3rem;
+      text-align: center;
+      transition: all 0.2s;
+      cursor: pointer;
+      position: relative;
+      background: var(--surface);
+    }
+ 
+    .upload-zone:hover {
+      border-color: var(--accent);
+      background: rgba(200,255,87,0.03);
+    }
+ 
+    .upload-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 1rem;
+      background: var(--surface2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+ 
+    .upload-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+ 
+    .upload-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+ 
+    .upload-input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+ 
+    .csv-fields {
+      margin-top: 2rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+ 
+    .csv-field {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+ 
+    .csv-field label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+ 
+    .csv-field input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+ 
+    .csv-field input:focus { border-color: var(--accent); }
+    .csv-field input::placeholder { color: var(--text-dim); }
+ 
+    /* ─── AI ADVICE PANEL ─── */
+    .advice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+ 
+    .advice-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+ 
+    .advice-card.featured {
+      grid-column: span 2;
+      border-color: rgba(200,255,87,0.2);
+      background: linear-gradient(135deg, rgba(200,255,87,0.04) 0%, transparent 60%);
+    }
+ 
+    .advice-priority {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.5rem;
+    }
+ 
+    .priority-high { color: var(--score-low); }
+    .priority-med { color: var(--score-mid); }
+    .priority-low { color: var(--accent); }
+ 
+    .advice-title {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+ 
+    .advice-body {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+ 
+    .advice-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 1rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+    }
+ 
+    /* ─── CHARTS / HISTORY ─── */
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+ 
+    .tabs {
+      display: flex;
+      gap: 0.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px;
+    }
+ 
+    .tab {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.15s;
+      border: none;
+      background: transparent;
+    }
+ 
+    .tab.active {
+      background: var(--surface2);
+      color: var(--text);
+    }
+ 
+    .chart-placeholder {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      height: 200px;
+      display: flex;
+      align-items: flex-end;
+      padding: 1.5rem;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+ 
+    .chart-placeholder::before {
+      content: 'Score History';
+      position: absolute;
+      top: 1rem;
+      left: 1.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+    }
+ 
+    .chart-bar {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      transition: opacity 0.2s;
+      background: linear-gradient(180deg, var(--accent) 0%, rgba(200,255,87,0.3) 100%);
+      opacity: 0.7;
+    }
+ 
+    .chart-bar:hover { opacity: 1; }
+    .chart-bar.active { opacity: 1; }
+ 
+    .chart-grid-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 1px;
+      background: var(--border);
+    }
+ 
+    /* ─── MACRO INDICATORS ─── */
+    .indicators-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+ 
+    .indicator-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+ 
+    .indicator-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+ 
+    .indicator-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.8rem;
+      letter-spacing: -0.02em;
+    }
+ 
+    .indicator-change {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      margin-top: 0.25rem;
+    }
+ 
+    .change-up { color: var(--score-low); }
+    .change-down { color: var(--accent); }
+    .change-neutral { color: var(--text-muted); }
+ 
+    /* ─── PHASE ROADMAP ─── */
+    .phases {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+ 
+    .phase {
+      background: var(--surface);
+      padding: 1.5rem;
+    }
+ 
+    .phase-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+ 
+    .phase-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+ 
+    .phase-items {
+      list-style: none;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+ 
+    .phase-items li::before {
+      content: '→ ';
+      color: var(--text-dim);
+      font-family: 'DM Mono', monospace;
+    }
+ 
+    .phase.active {
+      background: linear-gradient(135deg, rgba(200,255,87,0.06) 0%, var(--surface) 100%);
+    }
+ 
+    .phase-badge {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      padding: 2px 8px;
+      border-radius: 100px;
+      margin-top: 0.75rem;
+    }
+ 
+    .badge-active { background: rgba(200,255,87,0.15); color: var(--accent); border: 1px solid rgba(200,255,87,0.3); }
+    .badge-next { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+ 
+    /* ─── PLAID CONNECT ─── */
+    .connect-banner {
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+ 
+    .connect-info h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+ 
+    .connect-info p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      max-width: 400px;
+    }
+ 
+    .connect-logos {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-shrink: 0;
+    }
+ 
+    .service-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      padding: 6px 14px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      background: var(--surface2);
+    }
+ 
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      margin-top: 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+ 
+    .footer-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+ 
+    .footer-note {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+ 
+    /* ─── DIVIDER ─── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0;
+    }
+ 
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+ 
+    .hero > * { animation: fadeUp 0.6s ease both; }
+    .hero > *:nth-child(2) { animation-delay: 0.1s; }
+ 
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; gap: 2.5rem; }
+      h1 { font-size: 2.8rem; }
+      .indicators-grid { grid-template-columns: repeat(2, 1fr); }
+      .phases { grid-template-columns: repeat(2, 1fr); }
+      .advice-card.featured { grid-column: span 1; }
+      .advice-grid { grid-template-columns: 1fr; }
+      .csv-fields { grid-template-columns: repeat(2, 1fr); }
+    }
+ 
+    @media (max-width: 600px) {
+      .csv-fields { grid-template-columns: 1fr; }
+      .phases { grid-template-columns: 1fr; }
+      .indicators-grid { grid-template-columns: 1fr 1fr; }
+      h1 { font-size: 2.2rem; }
+      .score-number { font-size: 3.5rem; }
+    }
+ 
+    /* ─── LOADING SKELETON SHIMMER (for when real data loads) ─── */
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+ 
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px;
+    }
+ 
+    /* pill tag */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      padding: 3px 10px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      background: var(--surface2);
+    }

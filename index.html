@@ -3,9 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Financial Advisor</title>
+
+    <!-- Enabling bootstrap for forms stuff -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- This links to the my_style.css file so that we can apply its styling -->
+    <link rel="stylesheet" href="src\Frontend\my_style.css">
+
 </head>
 <body>
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="nav-logo">VandalVault<span> Hackathon</span></div>
+  <ul class="nav-links">
+    <li><a href="#score">Score</a></li>
+    <li><a href="#analysis">Analysis</a></li>
+    <li><a href="#history">History</a></li>
+    <li><a href="#connect">Connect</a></li>
+  </ul>
+  <div class="nav-badge">v0.1 - MVP</div>
+</nav>
+ 
+<!-- ─── HERO ─── -->
+<section class="page">
+    <div class="hero">
+        <!-- Left -->
+        <div>
+            <div class="hero-eyebrow">Financial Resilience Platform</div>
+            <h1>Are you ready for the next <em>recession?</em></h1>
+            <p class="hero-desc">
+                Stuff and Things
+            </p>
+        <div class="hero-actions">
+        <button class="btn btn-primary" onclick="document.getElementById('upload').scrollIntoView({behavior:'smooth'})">
+          ↑ Upload Financial Data
+        </button>
+      </div>
+    </div>
+ 
+    <!-- Right: Score Card -->
+    <div id="score">
+        <div class="score-card">
+        <div class="score-label">Your Recession Readiness Score</div>
+        <div class="score-number">_*SCORE*_<span class="score-max">/1000</span></div>
+        <div class="score-tier">
+            <span>●</span> ____*Feedback*___
+        </div>
+ 
+        <div style="margin-top: 1.25rem;">
+          <div class="score-bar-wrap">
+            <div class="score-bar-fill"></div>
+          </div>
+          <div class="score-range-labels">
+            <span>1 — High Risk</span>
+            <span>1000 — Excellent</span>
+          </div>
+        </div>
+ 
+        <div class="score-delta">
+          <span class="delta-up">▲ -+__ pts</span>
+          <span class="delta-label">from last assessment (___ __/__/____)</span>
+        </div>
+ 
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<div class="divider"></div>
+ 
+<!-- ─── DATA INPUT ─── -->
+<section class="page section" id="upload">
+    <div class="section-header">
+        <span class="section-num">01</span>
+        <h2 class="section-title">Financial Data Input</h2>
+    </div>
+ 
+  <!-- Upload Zone -->
+    <div class="upload-zone" id="dropZone">
+        <input type="file" class="upload-input" accept=".csv" id="csvInput" />
+        <div class="upload-icon">📂</div>
+        <div class="upload-title">Drop your CSV here, or click to browse</div>
+        <div class="upload-sub">Accepts .csv files with financial indicators</div>
+        <span class="tag">income</span>&nbsp;
+        <span class="tag">savings</span>&nbsp;
+        <span class="tag">monthly_expenses</span>&nbsp;
+        <span class="tag">debt_total</span>&nbsp;
+        <span class="tag">investments</span>&nbsp;
+        <span class="tag">emergency_fund_months</span>
+    </div>
+ 
+  <!-- Manual Input Fields -->
+    <div style="margin-top: 1rem; margin-bottom: 0.5rem;">
+        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'DM Mono', monospace;">or enter manually</span>
+    </div>
+ 
+    <div class="csv-fields">
+        <div class="csv-field">
+            <label>Monthly Income ($)</label>
+            <input type="number" placeholder="5000" />
+        </div>
+        <div class="csv-field">
+            <label>Monthly Expenses ($)</label>
+            <input type="number" placeholder="3200" />
+        </div>
+        <div class="csv-field">
+            <label>Emergency Fund (months)</label>
+            <input type="number" placeholder="4" />
+        </div>
+        <div class="csv-field">
+            <label>Total Debt ($)</label>
+            <input type="number" placeholder="18000" />
+        </div>
+        <div class="csv-field">
+            <label>Savings ($)</label>
+            <input type="number" placeholder="12000" />
+        </div>
+        <div class="csv-field">
+            <label>Investment Portfolio ($)</label>
+            <input type="number" placeholder="25000" />
+        </div>
+        <div class="csv-field">
+            <label>Job Security (1–10)</label>
+            <input type="number" placeholder="7" min="1" max="10" />
+        </div>
+        <div class="csv-field">
+            <label>Liquid Assets ($)</label>
+            <input type="number" placeholder="8000" />
+        </div>
+        <div class="csv-field">
+            <label>Monthly Debt Payments ($)</label>
+            <input type="number" placeholder="450" />
+        </div>
+        </div>
 
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+        <button class="btn btn-primary" style="font-size: 0.85rem;">
+            ⚡ Calculate My Score
+        </button>
+        <button class="btn btn-outline" style="font-size: 0.85rem;">Download CSV Template</button>
+    </div>
+</section>
+ 
+<div class="divider"></div>
+ 
+<!-- ─── MACRO INDICATORS ─── -->
+<section class="page section" id="analysis">
+    <div class="section-header">
+        <span class="section-num">02</span>
+        <h2 class="section-title">Economic Climate</h2>
+        <!-- !!!!!!!!!! via Yahoo Finance — Phase 2 !!!!! -->
+    </div>
+
+    <!-- !!!! The following are placeholders, fill in with actual data  !!!! -->
+    <div class="indicators-grid">
+        <div class="indicator-card">
+            <div class="indicator-name">US Inflation Rate</div>
+            <div class="indicator-value" style="color: var(--score-low);">3.4%</div>
+            <div class="indicator-change change-up">▲ +0.2% MoM</div>
+        </div>
+        <div class="indicator-card">
+            <div class="indicator-name">Fed Funds Rate</div>
+            <div class="indicator-value" style="color: var(--score-mid);">5.33%</div>
+            <div class="indicator-change change-neutral">— Unchanged</div>
+        </div>
+        <div class="indicator-card">
+            <div class="indicator-name">VIX (Volatility)</div>
+            <div class="indicator-value" style="color: var(--accent);">14.2</div>
+            <div class="indicator-change change-down">▼ −2.1 (Low Fear)</div>
+        </div>
+        <div class="indicator-card">
+            <div class="indicator-name">Unemployment</div>
+            <div class="indicator-value" style="color: var(--accent);">3.7%</div>
+            <div class="indicator-change change-down">▼ −0.1% MoM</div>
+        </div>
+    </div>
+</section>
+ 
+<div class="divider"></div>
+ 
+<!-- ─── AI ADVICE ─── -->
+<section class="page section">
+    <div class="section-header">
+        <span class="section-num">03</span>
+        <h2 class="section-title">AI-Powered Guidance</h2>
+        <span class="tag" style="margin-left: auto; font-size: 0.65rem;">Groq LLM</span>
+    </div>
+
+    <div class="advice-grid">
+        <div class="advice-card featured">
+            <div class="advice-priority priority-high">🔴 High Priority</div>
+            <div class="advice-title">*Temp*</div>
+            <div class="advice-body">
+                *Temp*
+        </div>
+        <div class="advice-action">*Temp*</div>
+    </div>
+
+    <div class="advice-card">
+        <div class="advice-priority priority-med">🟡 Medium Priority</div>
+        <div class="advice-title">*Temp*</div>
+        <div class="advice-body">
+            *Temp*
+        </div>
+        <div class="advice-action">*Temp*</div>
+    </div>
+
+    <div class="advice-card">
+        <div class="advice-priority priority-low">🟢 Looking Good</div>
+        <div class="advice-title">*Temp*</div>
+        <div class="advice-body">
+                *Temp*
+        </div>
+        <div class="advice-action">*Temp*</div>
+    </div>
+</section>
+ 
+<div class="divider"></div>
+ 
+<!-- ─── SCORE HISTORY ─── -->
+<section class="page section" id="history">
+    <div class="history-header">
+        <div style="display: flex; align-items: baseline; gap: 1rem;">
+            <span class="section-num">04</span>
+            <h2 class="section-title">Score History</h2>
+        </div>
+        <div class="tabs">
+            <button class="tab active">6M</button>
+            <button class="tab">1Y</button>
+            <button class="tab">All</button>
+        </div>
+    </div>
+
+    <div class="chart-placeholder">
+    <div class="chart-grid-line" style="bottom: 33%;"></div>
+    <div class="chart-grid-line" style="bottom: 66%;"></div>
+    <!-- Simulated bar chart -->
+    <div class="chart-bar" style="height: 55%;"></div>
+    <div class="chart-bar" style="height: 58%;"></div>
+    <div class="chart-bar" style="height: 61%;"></div>
+    <div class="chart-bar" style="height: 59%;"></div>
+    <div class="chart-bar" style="height: 65%;"></div>
+    <div class="chart-bar" style="height: 68%;"></div>
+    <div class="chart-bar" style="height: 64%;"></div>
+    <div class="chart-bar" style="height: 70%;"></div>
+    <div class="chart-bar" style="height: 72%;"></div>
+    <div class="chart-bar" style="height: 69%;"></div>
+    <div class="chart-bar" style="height: 73%;"></div>
+    <div class="chart-bar active" style="height: 73%; opacity: 1;"></div>
+    </div>
+
+    <!-- History Table -->
+    <div style="margin-top: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+            <thead>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <th style="padding: 0.9rem 1.25rem; text-align: left; font-family: 'DM Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500;">Date</th>
+                <th style="padding: 0.9rem 1.25rem; text-align: left; font-family: 'DM Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500;">Score</th>
+                <th style="padding: 0.9rem 1.25rem; text-align: left; font-family: 'DM Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500;">Change</th>
+                <th style="padding: 0.9rem 1.25rem; text-align: left; font-family: 'DM Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500;">Key Driver</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.9rem 1.25rem; font-family: 'DM Mono', monospace; color: var(--text-muted);">Mar 2025</td>
+                <td style="padding: 0.9rem 1.25rem; font-weight: 600; color: var(--accent);">728</td>
+                <td style="padding: 0.9rem 1.25rem; color: var(--score-good); font-family: 'DM Mono', monospace;">▲ +34</td>
+                <td style="padding: 0.9rem 1.25rem; color: var(--text-muted);">Emergency fund grew to 4 months</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.9rem 1.25rem; font-family: 'DM Mono', monospace; color: var(--text-muted);">Jan 2025</td>
+                <td style="padding: 0.9rem 1.25rem; font-weight: 600;">694</td>
+                <td style="padding: 0.9rem 1.25rem; color: var(--score-good); font-family: 'DM Mono', monospace;">▲ +12</td>
+                <td style="padding: 0.9rem 1.25rem; color: var(--text-muted);">Paid off auto loan</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.9rem 1.25rem; font-family: 'DM Mono', monospace; color: var(--text-muted);">Nov 2024</td>
+                <td style="padding: 0.9rem 1.25rem; font-weight: 600;">682</td>
+                <td style="padding: 0.9rem 1.25rem; color: var(--score-low); font-family: 'DM Mono', monospace;">▼ −8</td>
+                <td style="padding: 0.9rem 1.25rem; color: var(--text-muted);">New credit card balance</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+ 
+<div class="divider"></div>
+ 
+<!-- ─── CONNECT (Plaid / Phase 4) ─── -->
+<section class="page section" id="connect">
+    <div class="section-header">
+        <span class="section-num">05</span>
+        <h2 class="section-title">Auto-Connect Your Accounts</h2>
+        <span class="tag" style="margin-left: auto; font-size: 0.65rem;">Phase 4 — Plaid</span>
+    </div>
+
+    <div class="connect-banner">
+        <div class="connect-info">
+            <h3>Skip the CSV — link directly</h3>
+            <p>Connect your bank, investment, and credit accounts via Plaid for automatic, real-time updates to your Recession Readiness Score.</p>
+            <div style="margin-top: 1rem;">
+            <button class="btn btn-primary" style="opacity: 0.5; cursor: not-allowed; font-size: 0.82rem;" disabled>
+                🔗 Connect with Plaid *Update functionality in phase 4*
+            </button>
+        </div>
+    </div>
+    <div class="connect-logos">
+        <div class="service-pill">🏦 Checking</div>
+        <div class="service-pill">💳 Credit</div>
+        <div class="service-pill">📈 Brokerage</div>
+    </div>
+</section>
+ 
+<div class="divider"></div>
+ 
+<!-- ─── FOOTER ─── -->
+<footer class="page">
+    <div class="footer-logo">VandalVault</div>
+    <div class="footer-note">Hackathon MVP · University of Idaho · 2026</div>
+</footer>
+ 
+<script>
+  // Drag-over effect on upload zone
+  const dropZone = document.getElementById('dropZone');
+  dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropZone.style.borderColor = 'var(--accent)';
+    dropZone.style.background = 'rgba(200,255,87,0.05)';
+  });
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.style.borderColor = '';
+    dropZone.style.background = '';
+  });
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.style.borderColor = '';
+    dropZone.style.background = '';
+    const file = e.dataTransfer.files[0];
+    if (file && file.name.endsWith('.csv')) {
+      dropZone.querySelector('.upload-title').textContent = '✓ ' + file.name + ' loaded';
+      dropZone.style.borderColor = 'var(--accent)';
+    }
+  });
+ 
+  // CSV input label update
+  document.getElementById('csvInput').addEventListener('change', function() {
+    if (this.files[0]) {
+      dropZone.querySelector('.upload-title').textContent = '✓ ' + this.files[0].name + ' loaded';
+    }
+  });
+ 
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+ 
+  // Chart bar hover tooltips
+  // temp example data, update 
+  document.querySelectorAll('.chart-bar').forEach((bar, i) => {
+    const months = ['Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Feb','Mar'];
+    const scores = [550,580,610,590,650,680,640,700,720,690,730,728];
+    bar.title = `${months[i]}: ${scores[i]}`;
+  });
+</script>
 </body>
 </html>
