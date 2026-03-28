@@ -47,10 +47,7 @@
         <div class="score-card">
         <div class="score-label">Your *SHART Score</div>
         <div class="score-label">*(Savings Health and Ressession Threat)</div>
-        <div class="score-number">_*SCORE*_<span class="score-max">/1000</span></div>
-        <div class="score-tier">
-            <span>●</span> ____*Feedback*___
-        </div>
+        <div class="score-number">1000<span class="score-max">/1000</span></div>
  
         <div style="margin-top: 1.25rem;">
           <div class="score-bar-wrap">
@@ -522,9 +519,30 @@
 
   function updateScore(score) {
   const pct = (score / 1000) * 100;
-  document.querySelector('.score-bar-fill').style.width = pct + '%';
-  document.querySelector('.score-number').innerHTML = 
-    score + '<span class="score-max">/1000</span>';
+  const fillBar = document.querySelector('.score-bar-fill');
+  
+  // Use clip-path to cut off the gradient at the user's position
+  fillBar.style.clipPath = `polygon(0 0, ${pct}% 0, ${pct}% 100%, 0 100%)`;
+  
+  // Determine color based on score value
+  let scoreColor;
+  if (score < 200) {
+    scoreColor = 'var(--score-low)'; // Red
+  } else if (score < 400) {
+    scoreColor = '#ff6b35'; // Orange-red
+  } else if (score < 600) {
+    scoreColor = 'var(--score-mid)'; // Orange
+  } else if (score < 750) {
+    scoreColor = '#a8d957'; // Yellow-green
+  } else if (score < 900) {
+    scoreColor = 'var(--score-good)'; // Green
+  } else {
+    scoreColor = 'var(--accent)'; // Bright green (excellent)
+  }
+  
+  const scoreNum = document.querySelector('.score-number');
+  scoreNum.style.color = scoreColor;
+  scoreNum.innerHTML = score + '<span class="score-max">/1000</span>';
 }
 
 // Example: updateScore(728) → sets bar to 72.8%

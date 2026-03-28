@@ -264,7 +264,7 @@ def fetch_macro_data():
     {
         "success": boolean,
         "data": {
-            "inflation": float (CPI),
+            "inflation": float (inflation rate %),
             "gdp": float (GDP growth %),
             "cci": float (Consumer Confidence Index),
             "market_performance": float (S&P 500 return %),
@@ -290,7 +290,7 @@ def fetch_macro_data():
         
         # Map fetched data to form field names
         macro_data = {
-            "inflation": fred_data.get("cpi", 3.2),  # Default fallback
+            "inflation": fred_data.get("inflation", 3.2),  # Default fallback (PCE inflation %)
             "gdp": fred_data.get("gdp", 2.5),  # Default fallback
             "cci": 104.7,  # Not directly available, keeping default
             "market_performance": (yahoo_data.get("sp500", 5000) / 5000 - 1) * 100 if yahoo_data.get("sp500") else 0.05,

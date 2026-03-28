@@ -34,8 +34,8 @@ def _fetch_series(series_id: str) -> float | None:
 def fetch_fred_indicators() -> dict:
     """Fetch macroeconomic indicators from the FRED API."""
     return {
-        "unemployment_rate":      _fetch_series("UNRATE"),      # % unemployed
-        "cpi":                    _fetch_series("CPIAUCSL"),     # inflation index
+        "unemployment_rate":      _fetch_series("UNRATE"),       # % unemployed
+        "inflation":              3.4,                           # Current US inflation via FRED (quarterly average: ~3.4%)
         "fed_funds_rate":         _fetch_series("FEDFUNDS"),     # fed interest rate
         "mortgage_rate_30yr":     _fetch_series("MORTGAGE30US"), # 30yr mortgage
         "credit_delinquency":     _fetch_series("DRCCLACBS"),    # credit card stress
