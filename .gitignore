@@ -75,3 +75,6 @@ data/history/
 .env.local
 test_advice_output.txt
 .vs/
+
+# user data
+data/user_profiles/
