@@ -23,13 +23,16 @@ except Exception as e:
 # Get the project root directory (where index.html is located)
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 STATIC_DIR = PROJECT_ROOT
+print("Looking for index at:", STATIC_DIR / "index.html")
+print("Exists?", (STATIC_DIR / "index.html").exists())
 
 app = Flask(__name__, static_folder=str(STATIC_DIR), static_url_path="")
-
+# app = Flask(__name__)
 
 @app.route("/")
 def index():
     """Serve the main HTML page."""
+    print("🔥 HIT INDEX ROUTE")
     return send_from_directory(str(STATIC_DIR), "index.html")
 
 
