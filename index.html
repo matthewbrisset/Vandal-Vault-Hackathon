@@ -143,6 +143,50 @@
 <div class="divider"></div>
  
 <!-- ─── MACRO INDICATORS ─── -->
+ 
+<section class="page section" id="analysis">
+    <div class="section-header">
+        <span class="section-num">02</span>
+        <h2 class="section-title">Economic Climate</h2>
+        <span class="tag" style="margin-left: auto; font-size: 0.65rem;">Real-time Data</span>
+    </div>
+
+    <div style="margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center;">
+        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'DM Mono', monospace;">Real-time indicators (auto-loaded) or enter manually</span>
+        <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;" onclick="fetchMacroData()">
+            🔄 Load Real-time Data
+        </button>
+    </div>
+
+    <div class="csv-fields">
+        <div class="csv-field">
+            <label>Inflation Rate (%)</label>
+            <input type="number" id="inflation" placeholder="3.2" step="0.1" />
+        </div>
+        <div class="csv-field">
+            <label>GDP Growth (%)</label>
+            <input type="number" id="gdp" placeholder="2.5" step="0.1" />
+        </div>
+        <div class="csv-field">
+            <label>Consumer Confidence Index (CCI)</label>
+            <input type="number" id="cci" placeholder="104.7" step="0.1" />
+        </div>
+        <div class="csv-field">
+            <label>Market Performance (%)</label>
+            <input type="number" id="market_performance" placeholder="0.05" step="0.01" />
+        </div>
+    </div>
+
+    <div style="margin-top: 1rem; padding: 1rem; background: rgba(200,255,87,0.05); border-left: 3px solid var(--accent); border-radius: 4px;">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">
+            <strong>Data Sources:</strong><br/>
+            📊 FRED API (Federal Reserve) | 📈 Yahoo Finance | Default: Inflation 3.2% | GDP 2.5% | CCI 104.7 | Market 5%
+            <div id="macro-status" style="font-size: 0.75rem; margin-top: 0.5rem; display: none;">Loading...</div>
+        </div>
+    </div>
+</section>
+<!-- ─── MACRO INDICATORS ─── -->
+ <!--
 <section class="page section" id="analysis">
     <div class="section-header">
         <span class="section-num">02</span>
@@ -179,7 +223,7 @@
         <span id="macro-status">Awaiting data load...</span>
     </div>
 </section>
-
+-->
 <div class="divider"></div>
 
 <!-- ─── AI ADVICE ─── -->
@@ -324,7 +368,6 @@
     <div class="footer-note">Hackathon MVP · University of Idaho · 2026</div>
 </footer>
 
-<!-- change to python in the future probably -->
 <script>
   // Drag-over effect on upload zone
   const dropZone = document.getElementById('dropZone');
@@ -403,7 +446,7 @@
     });
   }
 
-  // Fetch real-time macro data from FRED and Yahoo Finance APIs
+/*
 function fetchMacroData() {
     document.getElementById('macro-status').textContent = '⏳ Fetching real-time data...';
 
@@ -444,7 +487,51 @@ function setIndicator(key, value, unit, baseline, higherIsBetter) {
     const sign   = diff > 0 ? '▲ +' : '▼ ';
     chgEl.textContent  = sign + Math.abs(diff).toFixed(1) + unit + ' vs baseline';
     chgEl.className    = 'indicator-change ' + (better ? 'change-down' : 'change-up');
-}
+}*/
+
+  // Fetch real-time macro data from FRED and Yahoo Finance APIs
+  function fetchMacroData() {
+    const statusDiv = document.getElementById('macro-status');
+    statusDiv.style.display = 'block';
+    statusDiv.textContent = '⏳ Fetching real-time economic data...';
+
+    fetch('/api/fetch-macro-data')
+      .then(response => response.json())
+      .then(result => {
+        if (result.success && result.data) {
+          // Populate macro fields with fetched data
+          if (result.data.inflation !== undefined && result.data.inflation !== null) {
+            document.getElementById('inflation').value = result.data.inflation;
+          }
+          if (result.data.gdp !== undefined && result.data.gdp !== null) {
+            document.getElementById('gdp').value = result.data.gdp;
+          }
+          if (result.data.cci !== undefined && result.data.cci !== null) {
+            document.getElementById('cci').value = result.data.cci;
+          }
+          if (result.data.market_performance !== undefined && result.data.market_performance !== null) {
+            document.getElementById('market_performance').value = result.data.market_performance;
+          }
+
+          // Display status message
+          let additionalInfo = '';
+          if (result.data.vix) additionalInfo += ` | VIX: ${result.data.vix}`;
+          if (result.data.unemployment_rate) additionalInfo += ` | Unemployment: ${result.data.unemployment_rate}%`;
+          if (result.data.fed_funds_rate) additionalInfo += ` | Fed Rate: ${result.data.fed_funds_rate}%`;
+
+          statusDiv.innerHTML = `✅ ${result.message}${additionalInfo}`;
+          statusDiv.style.color = 'var(--accent)';
+        } else {
+          statusDiv.textContent = `⚠️ ${result.message}`;
+          statusDiv.style.color = 'var(--text-muted)';
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching macro data:', error);
+        statusDiv.textContent = '❌ Failed to fetch real-time data: ' + error.message;
+        statusDiv.style.color = 'var(--score-low)';
+      });
+  }
  
   // Tab switching
   document.querySelectorAll('.tab').forEach(tab => {
