@@ -5,7 +5,7 @@ import io
 import tempfile
 from flask import Flask, request, jsonify, send_from_directory
 from pathlib import Path
-from src.Backend.csv_writer import write_user_personal_finance, write_macro_economic_data
+from src.Backend.csv_writer import write_user_personal_finance, write_macro_economic_data, write_score_history, read_score_history
 from src.Backend.user_advice_generator import generate_user_advice
 from src.Backend.score_calculator import calculate_resilience_score
 from src.Backend.csv_parser import CSVParser
@@ -109,6 +109,18 @@ def calculate_score():
             cci=float(data.get("cci", 104.7)),
             market_performance=float(data.get("market_performance", 0.05))
         )
+        
+        # Extract first advice point as key driver
+        key_driver = ""
+        if advice:
+            lines = advice.split('\n')
+            for line in lines:
+                if line.strip().startswith('-'):
+                    key_driver = line.strip()[1:].strip()
+                    break
+        
+        # Save score to history
+        write_score_history(user_id, int(score), key_driver)
         
         return jsonify({
             "success": True,
@@ -315,6 +327,44 @@ def fetch_macro_data():
             "success": False,
             "message": f"Error fetching macro data: {str(e)}",
             "data": None
+        }), 500
+
+
+
+@app.route("/api/score-history", methods=["GET"])
+def get_score_history():
+    """Get score history for a user.
+    
+    Query parameters:
+    - user_id: User ID (optional, returns all if not provided)
+    
+    Returns:
+    {
+        "success": boolean,
+        "data": [
+            {
+                "date": "2026-03-28",
+                "score": 728,
+                "key_driver": "Emergency fund grew to 4 months"
+            }
+        ]
+    }
+    """
+    try:
+        user_id = request.args.get('user_id')
+        history = read_score_history(user_id)
+        
+        # Sort by date descending (most recent first)
+        history = sorted(history, key=lambda x: x['date'], reverse=True)
+        
+        return jsonify({
+            "success": True,
+            "data": history
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Error retrieving history: {str(e)}"
         }), 500
 
 

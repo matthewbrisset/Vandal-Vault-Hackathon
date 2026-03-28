@@ -161,19 +161,19 @@
     <div class="csv-fields">
         <div class="csv-field">
             <label>Inflation Rate (%)</label>
-            <input type="number" id="inflation" placeholder="3.2" step="0.1" />
+            <input type="number" id="inflation" placeholder="3.2" step="0.1" readonly />
         </div>
         <div class="csv-field">
             <label>GDP Growth (%)</label>
-            <input type="number" id="gdp" placeholder="2.5" step="0.1" />
+            <input type="number" id="gdp" placeholder="2.5" step="0.1" readonly />
         </div>
         <div class="csv-field">
             <label>Consumer Confidence Index (CCI)</label>
-            <input type="number" id="cci" placeholder="104.7" step="0.1" />
+            <input type="number" id="cci" placeholder="104.7" step="0.1" readonly />
         </div>
         <div class="csv-field">
             <label>Market Performance (%)</label>
-            <input type="number" id="market_performance" placeholder="0.05" step="0.01" />
+            <input type="number" id="market_performance" placeholder="0.05" step="0.01" readonly />
         </div>
     </div>
 
@@ -185,45 +185,6 @@
         </div>
     </div>
 </section>
-<!-- ─── MACRO INDICATORS ─── -->
- <!--
-<section class="page section" id="analysis">
-    <div class="section-header">
-        <span class="section-num">02</span>
-        <h2 class="section-title">Economic Climate</h2>
-        <button class="btn btn-outline" style="margin-left: auto; font-size: 0.75rem; padding: 0.4rem 0.8rem;" onclick="fetchMacroData()">
-            🔄 Load Real-time Data
-        </button>
-    </div>
-
-    <div class="indicators-grid">
-        <div class="indicator-card">
-            <div class="indicator-name">Inflation Rate</div>
-            <div class="indicator-value" id="val-inflation">—</div>
-            <div class="indicator-change" id="chg-inflation">Loading...</div>
-        </div>
-        <div class="indicator-card">
-            <div class="indicator-name">GDP Growth</div>
-            <div class="indicator-value" id="val-gdp">—</div>
-            <div class="indicator-change" id="chg-gdp">Loading...</div>
-        </div>
-        <div class="indicator-card">
-            <div class="indicator-name">Consumer Confidence</div>
-            <div class="indicator-value" id="val-cci">—</div>
-            <div class="indicator-change" id="chg-cci">Loading...</div>
-        </div>
-        <div class="indicator-card">
-            <div class="indicator-name">Market Performance</div>
-            <div class="indicator-value" id="val-market">—</div>
-            <div class="indicator-change" id="chg-market">Loading...</div>
-        </div>
-    </div>
-
-    <div style="margin-top: 0.75rem; font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--text-dim);">
-        <span id="macro-status">Awaiting data load...</span>
-    </div>
-</section>
--->
 <div class="divider"></div>
 
 <!-- ─── AI ADVICE ─── -->
@@ -280,22 +241,10 @@
         </div>
     </div>
 
-    <div class="chart-placeholder">
+    <div class="chart-placeholder" id="chart-placeholder">
     <div class="chart-grid-line" style="bottom: 33%;"></div>
     <div class="chart-grid-line" style="bottom: 66%;"></div>
-    <!-- Simulated bar chart -->
-    <div class="chart-bar" style="height: 55%;"></div>
-    <div class="chart-bar" style="height: 58%;"></div>
-    <div class="chart-bar" style="height: 61%;"></div>
-    <div class="chart-bar" style="height: 59%;"></div>
-    <div class="chart-bar" style="height: 65%;"></div>
-    <div class="chart-bar" style="height: 68%;"></div>
-    <div class="chart-bar" style="height: 64%;"></div>
-    <div class="chart-bar" style="height: 70%;"></div>
-    <div class="chart-bar" style="height: 72%;"></div>
-    <div class="chart-bar" style="height: 69%;"></div>
-    <div class="chart-bar" style="height: 73%;"></div>
-    <div class="chart-bar active" style="height: 73%; opacity: 1;"></div>
+    <!-- Bars will be added by JavaScript -->
     </div>
 
     <!-- History Table -->
@@ -305,28 +254,12 @@
             <tr style="border-bottom: 1px solid var(--border);">
                 <th style="padding: 0.9rem 1.25rem; text-align: left; font-family: 'DM Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500;">Date</th>
                 <th style="padding: 0.9rem 1.25rem; text-align: left; font-family: 'DM Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500;">Score</th>
-                <th style="padding: 0.9rem 1.25rem; text-align: left; font-family: 'DM Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500;">Change</th>
                 <th style="padding: 0.9rem 1.25rem; text-align: left; font-family: 'DM Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500;">Key Driver</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="history-tbody">
             <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 0.9rem 1.25rem; font-family: 'DM Mono', monospace; color: var(--text-muted);">Mar 2025</td>
-                <td style="padding: 0.9rem 1.25rem; font-weight: 600; color: var(--accent);">728</td>
-                <td style="padding: 0.9rem 1.25rem; color: var(--score-good); font-family: 'DM Mono', monospace;">▲ +34</td>
-                <td style="padding: 0.9rem 1.25rem; color: var(--text-muted);">Emergency fund grew to 4 months</td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 0.9rem 1.25rem; font-family: 'DM Mono', monospace; color: var(--text-muted);">Jan 2025</td>
-                <td style="padding: 0.9rem 1.25rem; font-weight: 600;">694</td>
-                <td style="padding: 0.9rem 1.25rem; color: var(--score-good); font-family: 'DM Mono', monospace;">▲ +12</td>
-                <td style="padding: 0.9rem 1.25rem; color: var(--text-muted);">Paid off auto loan</td>
-            </tr>
-            <tr>
-                <td style="padding: 0.9rem 1.25rem; font-family: 'DM Mono', monospace; color: var(--text-muted);">Nov 2024</td>
-                <td style="padding: 0.9rem 1.25rem; font-weight: 600;">682</td>
-                <td style="padding: 0.9rem 1.25rem; color: var(--score-low); font-family: 'DM Mono', monospace;">▼ −8</td>
-                <td style="padding: 0.9rem 1.25rem; color: var(--text-muted);">New credit card balance</td>
+                <td colspan="3" style="padding: 0.9rem 1.25rem; color: var(--text-muted); text-align: center;">No history yet</td>
             </tr>
             </tbody>
         </table>
@@ -619,6 +552,9 @@ function setIndicator(key, value, unit, baseline, higherIsBetter) {
         }
         
         alert(`✅ Data saved! Your Score: ${result.score}/1000`);
+        
+        // Reload score history to show new entry
+        setTimeout(loadScoreHistory, 500);
       } else {
         alert('❌ Error: ' + result.error);
       }
@@ -670,6 +606,73 @@ function setIndicator(key, value, unit, baseline, higherIsBetter) {
     const scores = [550,580,610,590,650,680,640,700,720,690,730,728];
     bar.title = `${months[i]}: ${scores[i]}`;
   });
+
+  // Load and display score history
+  function loadScoreHistory() {
+    fetch('/api/score-history')
+      .then(response => response.json())
+      .then(result => {
+        if (result.success && result.data && result.data.length > 0) {
+          const data = result.data;
+          
+          // Populate chart
+          const chartPlaceholder = document.getElementById('chart-placeholder');
+          const chartBars = chartPlaceholder.querySelectorAll('.chart-bar');
+          chartBars.forEach(bar => bar.remove());
+          
+          // Add bars for each score (max last 12 entries)
+          const maxScore = 1000;
+          const recentData = data.slice(0, 12).reverse();
+          
+          recentData.forEach((item, i) => {
+            const height = (item.score / maxScore) * 100;
+            const bar = document.createElement('div');
+            bar.className = i === recentData.length - 1 ? 'chart-bar active' : 'chart-bar';
+            bar.style.height = height + '%';
+            bar.style.opacity = i === recentData.length - 1 ? '1' : '0.7';
+            bar.title = `${item.date}: ${item.score}`;
+            chartPlaceholder.appendChild(bar);
+          });
+          
+          // Populate table
+          const tbody = document.getElementById('history-tbody');
+          tbody.innerHTML = '';
+          
+          let prevScore = null;
+          data.forEach((item, i) => {
+            const row = document.createElement('tr');
+            if (i < data.length - 1) {
+              row.style.borderBottom = '1px solid var(--border)';
+            }
+            
+            // Calculate change from previous
+            let changeHTML = '';
+            if (prevScore !== null) {
+              const change = item.score - prevScore;
+              const changeStr = change >= 0 ? `▲ +${change}` : `▼ −${Math.abs(change)}`;
+              const changeColor = change >= 0 ? 'var(--score-good)' : 'var(--score-low)';
+              changeHTML = `<td style="padding: 0.9rem 1.25rem; color: ${changeColor}; font-family: 'DM Mono', monospace;">${changeStr}</td>`;
+            } else {
+              changeHTML = '<td style="padding: 0.9rem 1.25rem; color: var(--text-muted);"></td>';
+            }
+            prevScore = item.score;
+            
+            const dateFormat = new Date(item.date).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+            
+            row.innerHTML = `
+              <td style="padding: 0.9rem 1.25rem; font-family: 'DM Mono', monospace; color: var(--text-muted);">${dateFormat}</td>
+              <td style="padding: 0.9rem 1.25rem; font-weight: 600; color: var(--accent);">${item.score}</td>
+              <td style="padding: 0.9rem 1.25rem; color: var(--text-muted);">${item.key_driver || '-'}</td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+      })
+      .catch(error => console.error('Error loading score history:', error));
+  }
+  
+  // Load history on page load
+  loadScoreHistory();
 </script>
 </body>
 </html>

@@ -240,3 +240,82 @@ def write_micro_economic_data(
     """
     writer = CSVWriter(base_path)
     return writer.write_micro_indicators(data, date)
+
+
+def write_score_history(
+    user_id: str,
+    score: int,
+    key_driver: str = "",
+    date: Optional[str] = None,
+    base_path: str = "data"
+) -> Path:
+    """Convenience function to write score history.
+    
+    Args:
+        user_id: Unique user identifier
+        score: SHART score (1-1000)
+        key_driver: Main factor affecting the score
+        date: ISO format date (default: current date)
+        base_path: Root data directory
+        
+    Returns:
+        Path to the score history CSV
+    """
+    if date is None:
+        date = datetime.now().isoformat().split('T')[0]
+    
+    history_dir = Path(base_path) / "history"
+    history_dir.mkdir(parents=True, exist_ok=True)
+    
+    file_path = history_dir / "score_history.csv"
+    
+    row_data = {
+        "user_id": user_id,
+        "date": date,
+        "score": score,
+        "key_driver": key_driver
+    }
+    
+    file_exists = file_path.exists()
+    mode = 'a' if file_exists else 'w'
+    
+    with open(file_path, mode, newline='') as csvfile:
+        fieldnames = ["user_id", "date", "score", "key_driver"]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        
+        if mode == 'w':
+            writer.writeheader()
+        
+        writer.writerow(row_data)
+    
+    return file_path
+
+
+def read_score_history(user_id: str = None, base_path: str = "data") -> List[Dict[str, Any]]:
+    """Read score history from CSV.
+    
+    Args:
+        user_id: Optional user ID to filter by (if None, returns all)
+        base_path: Root data directory
+        
+    Returns:
+        List of score history records
+    """
+    file_path = Path(base_path) / "history" / "score_history.csv"
+    
+    if not file_path.exists():
+        return []
+    
+    records = []
+    with open(file_path, 'r', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if user_id is None or row['user_id'] == user_id:
+                records.append({
+                    'user_id': row['user_id'],
+                    'date': row['date'],
+                    'score': int(row['score']),
+                    'key_driver': row['key_driver']
+                })
+    
+    return records
