@@ -74,3 +74,4 @@ data/history/
 *.csv.bak
 .env.local
 test_advice_output.txt
+.vs/
