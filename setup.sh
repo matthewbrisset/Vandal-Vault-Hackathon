@@ -37,6 +37,15 @@ echo "Installing dependencies..."
 pip install -r requirements.txt
 echo "✓ Dependencies installed"
 
+# Verify pytest installation
+echo ""
+echo "Verifying pytest installation..."
+if ! pytest --version &> /dev/null; then
+    echo "Installing pytest explicitly..."
+    pip install pytest
+fi
+echo "✓ pytest is ready"
+
 # Create .env file if it doesn't exist
 echo ""
 echo "Setting up environment variables..."

@@ -12,6 +12,13 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "[*] Installing dependencies..."
     pip install -r requirements.txt
     
+    Write-Host "[*] Verifying pytest installation..."
+    pytest --version
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[!] pytest not found. Installing explicitly..."
+        pip install pytest
+    }
+    
     Write-Host "[*] Setting up environment..."
     if (-Not (Test-Path ".env")) {
         Copy-Item ".env.example" ".env"
