@@ -32,17 +32,18 @@ class UserAdviceGenerator:
         self.client = Groq(api_key=self.api_key)
         self.model = "llama-3.3-70b-versatile"
     
-    def _build_prompt(self, record: FinancialRecord) -> str:
-        """Build a prompt from financial record.
+    def _build_prompt(self, record: FinancialRecord, macro_indicators: dict = None) -> str:
+        """Build a prompt from financial record and optional macro indicators.
         
         Args:
             record: FinancialRecord containing financial data
+            macro_indicators: Optional dict with keys: inflation, gdp, cci, market_performance
             
         Returns:
             Formatted prompt string for Groq
         """
         prompt = """You are a financial advisor specializing in recession preparedness. 
-Analyze the following financial profile and provide practical advice for improving economic resilience.
+Analyze the following financial profile and economic context to provide practical advice for improving economic resilience.
 
 FINANCIAL PROFILE:
 """
@@ -65,6 +66,18 @@ FINANCIAL PROFILE:
                 else:
                     prompt += f"- {key.replace('_', ' ').title()}: {value}\n"
         
+        # Add economic context
+        if macro_indicators:
+            prompt += "\nECONOMIC CONTEXT (Current Macro Indicators):\n"
+            if macro_indicators.get('inflation') is not None:
+                prompt += f"- Inflation Rate: {macro_indicators.get('inflation', 3.2):.1f}%\n"
+            if macro_indicators.get('gdp') is not None:
+                prompt += f"- GDP Growth: {macro_indicators.get('gdp', 2.5):.1f}%\n"
+            if macro_indicators.get('cci') is not None:
+                prompt += f"- Consumer Confidence Index: {macro_indicators.get('cci', 104.7):.1f}\n"
+            if macro_indicators.get('market_performance') is not None:
+                prompt += f"- Market Performance: {macro_indicators.get('market_performance', 0.05):.1f}%\n"
+        
         prompt += """
 Provide financial advice in the following EXACT format with exactly 3 bullet points per category:
 
@@ -85,11 +98,12 @@ LOOKING GOOD:
         
         return prompt
     
-    def generate_advice(self, record: FinancialRecord) -> str:
+    def generate_advice(self, record: FinancialRecord, macro_indicators: dict = None) -> str:
         """Generate financial advice from a FinancialRecord.
         
         Args:
             record: FinancialRecord containing financial data
+            macro_indicators: Optional dict with keys: inflation, gdp, cci, market_performance
             
         Returns:
             String containing AI-generated financial advice
@@ -97,7 +111,7 @@ LOOKING GOOD:
         Raises:
             Exception: If API call fails
         """
-        prompt = self._build_prompt(record)
+        prompt = self._build_prompt(record, macro_indicators=macro_indicators)
         
         try:
             message = self.client.chat.completions.create(
@@ -118,15 +132,16 @@ LOOKING GOOD:
             raise Exception(f"Failed to generate advice from Groq API: {e}")
 
 
-def generate_user_advice(record: FinancialRecord, api_key: Optional[str] = None) -> str:
+def generate_user_advice(record: FinancialRecord, macro_indicators: dict = None, api_key: Optional[str] = None) -> str:
     """Convenience function to generate advice from a FinancialRecord.
     
     Args:
         record: FinancialRecord containing financial data
+        macro_indicators: Optional dict with keys: inflation, gdp, cci, market_performance
         api_key: Optional Groq API key (uses GROQ_API_KEY env var if not provided)
         
     Returns:
         String containing AI-generated financial advice
     """
     generator = UserAdviceGenerator(api_key=api_key)
-    return generator.generate_advice(record)
+    return generator.generate_advice(record, macro_indicators=macro_indicators)

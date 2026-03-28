@@ -90,8 +90,16 @@ def calculate_score():
         # Write to CSV
         write_user_personal_finance(user_id, csv_data)
         
-        # Generate advice from Groq LLM
-        advice = generate_user_advice(csv_data)
+        # Extract macro indicators
+        macro_indicators = {
+            "inflation": float(data.get("inflation", 3.2)),
+            "gdp": float(data.get("gdp", 2.5)),
+            "cci": float(data.get("cci", 104.7)),
+            "market_performance": float(data.get("market_performance", 0.05))
+        }
+        
+        # Generate advice from Groq LLM with macro context
+        advice = generate_user_advice(csv_data, macro_indicators=macro_indicators)
         
         # Calculate score using weighted scoring algorithm
         score = calculate_resilience_score(
@@ -103,11 +111,11 @@ def calculate_score():
             investment_accounts=csv_data["investment_accounts"],
             retirement_accounts=csv_data["retirement_accounts"],
             debt_to_income_ratio=csv_data["debt_to_income_ratio"],
-            # Macro indicators with defaults
-            inflation=float(data.get("inflation", 3.2)),
-            gdp=float(data.get("gdp", 2.5)),
-            cci=float(data.get("cci", 104.7)),
-            market_performance=float(data.get("market_performance", 0.05))
+            # Macro indicators
+            inflation=macro_indicators["inflation"],
+            gdp=macro_indicators["gdp"],
+            cci=macro_indicators["cci"],
+            market_performance=macro_indicators["market_performance"]
         )
         
         # Extract first advice point as key driver
