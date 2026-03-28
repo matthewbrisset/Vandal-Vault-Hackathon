@@ -1,2 +1,2 @@
 # Vandal-Vault-Hackathon
-Connor and those guys
+Connor and these guys

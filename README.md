@@ -3,6 +3,8 @@
 A financial advisory tool that calculates your recession readiness score (1-1000) and provides AI-powered recommendations using Groq API.
 
 ## Quick Start
+- Command to host server: python -m src.Backend.app
+- localhost:5000
 
 ### Prerequisites
 - Python 3.9 or higher
