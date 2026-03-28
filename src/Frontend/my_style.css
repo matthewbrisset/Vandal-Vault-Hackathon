@@ -247,7 +247,6 @@
  
     .score-bar-fill {
       height: 100%;
-      width: 73%;
       background: linear-gradient(90deg, var(--score-low), var(--score-mid), var(--score-good), var(--accent));
       border-radius: 100px;
       position: relative;

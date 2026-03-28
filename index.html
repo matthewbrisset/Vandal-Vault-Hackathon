@@ -45,7 +45,8 @@
     <!-- Right: Score Card -->
     <div id="score">
         <div class="score-card">
-        <div class="score-label">Your Recession Readiness Score</div>
+        <div class="score-label">Your *SHART Score</div>
+        <div class="score-label">*(Savings Health and Ressession Threat)</div>
         <div class="score-number">_*SCORE*_<span class="score-max">/1000</span></div>
         <div class="score-tier">
             <span>●</span> ____*Feedback*___
@@ -53,6 +54,7 @@
  
         <div style="margin-top: 1.25rem;">
           <div class="score-bar-wrap">
+            <!-- The fill width will be set dynamically via JavaScript based on the score -->
             <div class="score-bar-fill"></div>
           </div>
           <div class="score-range-labels">
@@ -361,6 +363,15 @@
       tab.classList.add('active');
     });
   });
+
+  function updateScore(score) {
+  const pct = (score / 1000) * 100;
+  document.querySelector('.score-bar-fill').style.width = pct + '%';
+  document.querySelector('.score-number').innerHTML = 
+    score + '<span class="score-max">/1000</span>';
+}
+
+// Example: updateScore(728) → sets bar to 72.8%
  
   // Chart bar hover tooltips
   // temp example data, update 
