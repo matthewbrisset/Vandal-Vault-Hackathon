@@ -345,17 +345,66 @@
     dropZone.style.background = '';
     const file = e.dataTransfer.files[0];
     if (file && file.name.endsWith('.csv')) {
-      dropZone.querySelector('.upload-title').textContent = '✓ ' + file.name + ' loaded';
+      dropZone.querySelector('.upload-title').textContent = '✓ Parsing ' + file.name + '...';
       dropZone.style.borderColor = 'var(--accent)';
+      parseAndPopulateCSV(file);
     }
   });
  
   // CSV input label update
   document.getElementById('csvInput').addEventListener('change', function() {
     if (this.files[0]) {
-      dropZone.querySelector('.upload-title').textContent = '✓ ' + this.files[0].name + ' loaded';
+      dropZone.querySelector('.upload-title').textContent = '✓ Parsing ' + this.files[0].name + '...';
+      parseAndPopulateCSV(this.files[0]);
     }
   });
+
+  // Parse CSV and populate form fields
+  function parseAndPopulateCSV(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    fetch('/api/parse-csv', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(result => {
+      if (result.success) {
+        // Populate form fields from parsed CSV data
+        const fieldMap = {
+          'total_savings': document.getElementById('total_savings'),
+          'total_debt': document.getElementById('total_debt'),
+          'monthly_income': document.getElementById('monthly_income'),
+          'monthly_expenses': document.getElementById('monthly_expenses'),
+          'emergency_fund_months': document.getElementById('emergency_fund_months'),
+          'investment_accounts': document.getElementById('investment_accounts'),
+          'retirement_accounts': document.getElementById('retirement_accounts'),
+          'credit_score': document.getElementById('credit_score'),
+          'debt_to_income_ratio': document.getElementById('debt_to_income_ratio')
+        };
+        
+        // Fill in form fields with parsed data
+        for (const [fieldName, fieldElement] of Object.entries(fieldMap)) {
+          if (result.data[fieldName] !== undefined && fieldElement) {
+            fieldElement.value = result.data[fieldName];
+          }
+        }
+        
+        dropZone.querySelector('.upload-title').textContent = '✓ ' + file.name + ' loaded and parsed';
+        dropZone.style.borderColor = 'var(--accent)';
+        alert(`✅ CSV loaded! ${result.message}`);
+      } else {
+        alert('❌ Error: ' + result.error);
+        dropZone.querySelector('.upload-title').textContent = 'Drop CSV here or click';
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('❌ Failed to parse CSV: ' + error.message);
+      dropZone.querySelector('.upload-title').textContent = 'Drop CSV here or click';
+    });
+  }
  
   // Tab switching
   document.querySelectorAll('.tab').forEach(tab => {

@@ -1,11 +1,14 @@
 """Flask web server for Vandal Vault - connects HTML frontend to Python backend."""
 
 import os
+import io
+import tempfile
 from flask import Flask, request, jsonify, send_from_directory
 from pathlib import Path
 from src.Backend.csv_writer import write_user_personal_finance, write_macro_economic_data
 from src.Backend.user_advice_generator import generate_user_advice
 from src.Backend.score_calculator import calculate_resilience_score
+from src.Backend.csv_parser import CSVParser
 
 # Get the project root directory (where index.html is located)
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -147,6 +150,86 @@ def add_macro_indicators():
         return jsonify({"error": f"Invalid data types: {str(e)}"}), 400
     except Exception as e:
         return jsonify({"error": f"Server error: {str(e)}"}), 500
+
+
+@app.route("/api/parse-csv", methods=["POST"])
+def parse_csv():
+    """Parse uploaded CSV file and return first record's financial data.
+    
+    Expects a multipart form data with 'file' containing CSV file.
+    Returns the first data row mapped to form fields.
+    """
+    try:
+        # Check if file is in request
+        if 'file' not in request.files:
+            return jsonify({"error": "No file provided"}), 400
+        
+        file = request.files['file']
+        
+        if file.filename == '':
+            return jsonify({"error": "No file selected"}), 400
+        
+        if not file.filename.endswith('.csv'):
+            return jsonify({"error": "File must be a CSV file"}), 400
+        
+        # Read file contents and save to temporary file
+        csv_content = file.read().decode('utf-8')
+        
+        # Create temporary file in system temp directory
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False, encoding='utf-8') as temp_file:
+            temp_file.write(csv_content)
+            temp_path = temp_file.name
+        
+        try:
+            # Parse CSV using CSVParser
+            parser = CSVParser(temp_path)
+            
+            if not parser.records:
+                return jsonify({"error": "CSV file is empty or contains no data rows"}), 400
+            
+            # Get first record
+            first_record = parser.get_record(0)
+            record_data = first_record.data
+            
+            # Map CSV fields to form field IDs (case-insensitive matching)
+            form_data = {}
+            field_mapping = {
+                'total_savings': 'total_savings',
+                'total_debt': 'total_debt',
+                'monthly_income': 'monthly_income',
+                'monthly_expenses': 'monthly_expenses',
+                'emergency_fund_months': 'emergency_fund_months',
+                'investment_accounts': 'investment_accounts',
+                'retirement_accounts': 'retirement_accounts',
+                'credit_score': 'credit_score',
+                'debt_to_income_ratio': 'debt_to_income_ratio'
+            }
+            
+            # Match CSV columns to form fields (case-insensitive)
+            for csv_col in parser.headers:
+                col_lower = csv_col.lower().strip()
+                for form_field in field_mapping.keys():
+                    if col_lower == form_field.lower() or col_lower.replace('_', ' ') == form_field.replace('_', ' '):
+                        value = record_data.get(csv_col)
+                        if value is not None:
+                            form_data[field_mapping[form_field]] = value
+            
+            return jsonify({
+                "success": True,
+                "data": form_data,
+                "headers": parser.headers,
+                "message": f"Parsed CSV with {len(parser.records)} records"
+            }), 200
+            
+        finally:
+            # Clean up temp file
+            try:
+                os.remove(temp_path)
+            except:
+                pass
+        
+    except Exception as e:
+        return jsonify({"error": f"Error parsing CSV: {str(e)}"}), 500
 
 
 @app.route("/api/health", methods=["GET"])

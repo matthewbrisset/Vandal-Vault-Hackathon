@@ -1,6 +1,9 @@
 """Pytest for Flask app endpoints."""
 
 import pytest
+import tempfile
+import os
+from io import BytesIO
 from src.Backend.app import app
 
 
@@ -111,6 +114,47 @@ class TestAPIEndpoints:
         data = response.get_json()
         assert "error" in data
         assert "Missing fields" in data["error"]
+    
+    def test_parse_csv_success(self, client):
+        """Test successful CSV parsing and form population."""
+        # Create a temporary CSV file
+        csv_content = b"""total_savings,total_debt,monthly_income,monthly_expenses,emergency_fund_months,investment_accounts,retirement_accounts,credit_score,debt_to_income_ratio
+25000,15000,5000,3500,4,30000,80000,680,0.4"""
+        
+        data = {
+            'file': (BytesIO(csv_content), 'test_financial.csv')
+        }
+        
+        response = client.post("/api/parse-csv", data=data, content_type='multipart/form-data')
+        assert response.status_code == 200
+        
+        result = response.get_json()
+        assert result["success"] is True
+        assert "data" in result
+        assert result["data"]["total_savings"] == 25000
+        assert result["data"]["monthly_income"] == 5000
+        assert result["data"]["credit_score"] == 680
+    
+    def test_parse_csv_missing_file(self, client):
+        """Test CSV parsing without file."""
+        response = client.post("/api/parse-csv", data={}, content_type='multipart/form-data')
+        assert response.status_code == 400
+        data = response.get_json()
+        assert "error" in data
+        assert "No file provided" in data["error"]
+    
+    def test_parse_csv_invalid_format(self, client):
+        """Test CSV parsing with non-CSV file."""
+        invalid_content = b"This is not a CSV file"
+        
+        data = {
+            'file': (BytesIO(invalid_content), 'test.txt')
+        }
+        
+        response = client.post("/api/parse-csv", data=data, content_type='multipart/form-data')
+        assert response.status_code == 400
+        result = response.get_json()
+        assert "error" in result
 
 
 class TestResilienceScore:
