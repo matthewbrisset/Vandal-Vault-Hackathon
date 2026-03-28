@@ -1,0 +1,11 @@
+10% - debt to income ratio
+10% - expense to income ratio
+5% - credit score
+10% - savings
+10% - liquid investments
+5% - illiquid investments
+5% - stockpiles
+15% - inflation
+10% - GDP
+10% - CCI
+10% - market performance
