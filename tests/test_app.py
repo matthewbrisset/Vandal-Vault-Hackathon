@@ -34,11 +34,14 @@ class TestAPIEndpoints:
             "total_debt": 15000,
             "monthly_income": 5000,
             "monthly_expenses": 3500,
-            "emergency_fund_months": 4,
             "investment_accounts": 30000,
             "retirement_accounts": 80000,
             "credit_score": 680,
-            "debt_to_income_ratio": 0.4
+            "debt_to_income_ratio": 0.4,
+            "inflation": 3.2,
+            "gdp": 2.5,
+            "cci": 104.7,
+            "market_performance": 0.05
         }
         
         response = client.post("/api/calculate-score", json=payload)
@@ -117,9 +120,9 @@ class TestAPIEndpoints:
     
     def test_parse_csv_success(self, client):
         """Test successful CSV parsing and form population."""
-        # Create a temporary CSV file
-        csv_content = b"""total_savings,total_debt,monthly_income,monthly_expenses,emergency_fund_months,investment_accounts,retirement_accounts,credit_score,debt_to_income_ratio
-25000,15000,5000,3500,4,30000,80000,680,0.4"""
+        # Create a temporary CSV file with personal and macro indicators
+        csv_content = b"""total_savings,total_debt,monthly_income,monthly_expenses,investment_accounts,retirement_accounts,credit_score,debt_to_income_ratio,inflation,gdp,cci,market_performance
+25000,15000,5000,3500,30000,80000,680,0.4,3.2,2.5,104.7,0.05"""
         
         data = {
             'file': (BytesIO(csv_content), 'test_financial.csv')
@@ -134,6 +137,11 @@ class TestAPIEndpoints:
         assert result["data"]["total_savings"] == 25000
         assert result["data"]["monthly_income"] == 5000
         assert result["data"]["credit_score"] == 680
+        # Check macro indicators are also parsed
+        assert result["data"]["inflation"] == 3.2
+        assert result["data"]["gdp"] == 2.5
+        assert result["data"]["cci"] == 104.7
+        assert result["data"]["market_performance"] == 0.05
     
     def test_parse_csv_missing_file(self, client):
         """Test CSV parsing without file."""
@@ -155,6 +163,50 @@ class TestAPIEndpoints:
         assert response.status_code == 400
         result = response.get_json()
         assert "error" in result
+    
+    def test_macro_indicators_affect_score(self, client):
+        """Test that different macro indicators produce different scores."""
+        base_payload = {
+            "user_id": "test_user",
+            "total_savings": 25000,
+            "total_debt": 15000,
+            "monthly_income": 5000,
+            "monthly_expenses": 3500,
+            "investment_accounts": 30000,
+            "retirement_accounts": 80000,
+            "credit_score": 680,
+            "debt_to_income_ratio": 0.4
+        }
+        
+        # Test with good macro conditions
+        good_macro = {**base_payload, "inflation": 2.0, "gdp": 3.5, "cci": 110.0, "market_performance": 0.10}
+        response_good = client.post("/api/calculate-score", json=good_macro)
+        score_good = response_good.get_json()["score"]
+        
+        # Test with poor macro conditions
+        poor_macro = {**base_payload, "inflation": 5.0, "gdp": -1.0, "cci": 90.0, "market_performance": -0.10}
+        response_poor = client.post("/api/calculate-score", json=poor_macro)
+        score_poor = response_poor.get_json()["score"]
+        
+        # Good macro should score higher than poor macro (with same personal finances)
+        assert score_good > score_poor, f"Good macro ({score_good}) should beat poor macro ({score_poor})"
+    
+    def test_fetch_macro_data_endpoint(self, client):
+        """Test macro data fetching endpoint."""
+        response = client.get("/api/fetch-macro-data")
+        
+        # Endpoint should return 200 or 503 (depending on API availability)
+        assert response.status_code in [200, 503]
+        
+        data = response.get_json()
+        assert "success" in data
+        assert "message" in data
+        
+        if response.status_code == 200:
+            assert data["success"] is True
+            assert "data" in data
+            # Should contain macro data fields
+            assert any(k in data["data"] for k in ["inflation", "gdp", "market_performance"])
 
 
 class TestResilienceScore:

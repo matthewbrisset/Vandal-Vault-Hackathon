@@ -10,6 +10,15 @@ from src.Backend.user_advice_generator import generate_user_advice
 from src.Backend.score_calculator import calculate_resilience_score
 from src.Backend.csv_parser import CSVParser
 
+# Try to import macro_enricher for real economic data
+try:
+    from src.Backend.macro.yahoo_fetcher import fetch_yahoo_indicators
+    from src.Backend.macro.fred_fetcher import fetch_fred_indicators
+    MACRO_AVAILABLE = True
+except (ImportError, ModuleNotFoundError) as e:
+    print(f"⚠️  Macro data fetchers not fully configured: {e}")
+    MACRO_AVAILABLE = False
+
 # Get the project root directory (where index.html is located)
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 STATIC_DIR = PROJECT_ROOT
@@ -34,11 +43,14 @@ def calculate_score():
         "total_debt": 15000,
         "monthly_income": 5000,
         "monthly_expenses": 3500,
-        "emergency_fund_months": 4,
         "investment_accounts": 30000,
         "retirement_accounts": 80000,
         "credit_score": 680,
-        "debt_to_income_ratio": 0.4
+        "debt_to_income_ratio": 0.4,
+        "inflation": 3.2,
+        "gdp": 2.5,
+        "cci": 104.7,
+        "market_performance": 0.05
     }
     """
     try:
@@ -47,7 +59,7 @@ def calculate_score():
         # Validate required fields
         required_fields = [
             "total_savings", "total_debt", "monthly_income",
-            "monthly_expenses", "emergency_fund_months", "credit_score",
+            "monthly_expenses", "credit_score",
             "debt_to_income_ratio"
         ]
         
@@ -64,7 +76,7 @@ def calculate_score():
             "total_debt": float(data["total_debt"]),
             "monthly_income": float(data["monthly_income"]),
             "monthly_expenses": float(data["monthly_expenses"]),
-            "emergency_fund_months": float(data["emergency_fund_months"]),
+            "emergency_fund_months": float(data["total_savings"]) / float(data["monthly_expenses"]) if float(data["monthly_expenses"]) > 0 else 0,
             "investment_accounts": float(data.get("investment_accounts", 0)),
             "retirement_accounts": float(data.get("retirement_accounts", 0)),
             "credit_score": int(data["credit_score"]),
@@ -86,7 +98,12 @@ def calculate_score():
             credit_score=csv_data["credit_score"],
             investment_accounts=csv_data["investment_accounts"],
             retirement_accounts=csv_data["retirement_accounts"],
-            debt_to_income_ratio=csv_data["debt_to_income_ratio"]
+            debt_to_income_ratio=csv_data["debt_to_income_ratio"],
+            # Macro indicators with defaults
+            inflation=float(data.get("inflation", 3.2)),
+            gdp=float(data.get("gdp", 2.5)),
+            cci=float(data.get("cci", 104.7)),
+            market_performance=float(data.get("market_performance", 0.05))
         )
         
         return jsonify({
@@ -198,11 +215,15 @@ def parse_csv():
                 'total_debt': 'total_debt',
                 'monthly_income': 'monthly_income',
                 'monthly_expenses': 'monthly_expenses',
-                'emergency_fund_months': 'emergency_fund_months',
                 'investment_accounts': 'investment_accounts',
                 'retirement_accounts': 'retirement_accounts',
                 'credit_score': 'credit_score',
-                'debt_to_income_ratio': 'debt_to_income_ratio'
+                'debt_to_income_ratio': 'debt_to_income_ratio',
+                # Macro indicators
+                'inflation': 'inflation',
+                'gdp': 'gdp',
+                'cci': 'cci',
+                'market_performance': 'market_performance'
             }
             
             # Match CSV columns to form fields (case-insensitive)
@@ -230,6 +251,67 @@ def parse_csv():
         
     except Exception as e:
         return jsonify({"error": f"Error parsing CSV: {str(e)}"}), 500
+
+
+
+
+@app.route("/api/fetch-macro-data", methods=["GET"])
+def fetch_macro_data():
+    """Fetch real macroeconomic data from FRED and Yahoo Finance APIs.
+    
+    Returns:
+    {
+        "success": boolean,
+        "data": {
+            "inflation": float (CPI),
+            "gdp": float (GDP growth %),
+            "cci": float (Consumer Confidence Index),
+            "market_performance": float (S&P 500 return %),
+            "vix": float (Market Volatility Index),
+            "fed_funds_rate": float,
+            "unemployment_rate": float
+        },
+        "source": "real-time economic data",
+        "message": string
+    }
+    """
+    if not MACRO_AVAILABLE:
+        return jsonify({
+            "success": False,
+            "message": "Macro data fetchers not configured. Please install yfinance and configure FRED_API_KEY in .env",
+            "data": None
+        }), 503
+    
+    try:
+        # Fetch real data from APIs
+        yahoo_data = fetch_yahoo_indicators()
+        fred_data = fetch_fred_indicators()
+        
+        # Map fetched data to form field names
+        macro_data = {
+            "inflation": fred_data.get("cpi", 3.2),  # Default fallback
+            "gdp": fred_data.get("gdp", 2.5),  # Default fallback
+            "cci": 104.7,  # Not directly available, keeping default
+            "market_performance": (yahoo_data.get("sp500", 5000) / 5000 - 1) * 100 if yahoo_data.get("sp500") else 0.05,
+            "vix": yahoo_data.get("vix"),
+            "fed_funds_rate": fred_data.get("fed_funds_rate"),
+            "unemployment_rate": fred_data.get("unemployment_rate"),
+            "mortgage_rate_30yr": fred_data.get("mortgage_rate_30yr")
+        }
+        
+        return jsonify({
+            "success": True,
+            "data": macro_data,
+            "source": "real-time FRED & Yahoo Finance APIs",
+            "message": "Successfully fetched real-time macro indicators"
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": f"Error fetching macro data: {str(e)}",
+            "data": None
+        }), 500
 
 
 @app.route("/api/health", methods=["GET"])

@@ -92,8 +92,8 @@
         <span class="tag">savings</span>&nbsp;
         <span class="tag">monthly_expenses</span>&nbsp;
         <span class="tag">debt_total</span>&nbsp;
-        <span class="tag">investments</span>&nbsp;
-        <span class="tag">emergency_fund_months</span>
+        <span class="tag">liquid_investments</span>&nbsp;
+        <span class="tag">illiquid_investments</span>
     </div>
  
   <!-- Manual Input Fields -->
@@ -111,10 +111,6 @@
             <input type="number" id="monthly_expenses" placeholder="3200" />
         </div>
         <div class="csv-field">
-            <label>Emergency Fund (months)</label>
-            <input type="number" id="emergency_fund_months" placeholder="4" />
-        </div>
-        <div class="csv-field">
             <label>Total Debt ($)</label>
             <input type="number" id="total_debt" placeholder="18000" />
         </div>
@@ -123,16 +119,16 @@
             <input type="number" id="total_savings" placeholder="12000" />
         </div>
         <div class="csv-field">
-            <label>Investment Portfolio ($)</label>
+            <label>Credit Score</label>
+            <input type="number" id="credit_score" placeholder="680" min="300" max="850" />
+        </div>
+        <div class="csv-field">
+            <label>Liquid Investments ($)</label>
             <input type="number" id="investment_accounts" placeholder="25000" />
         </div>
         <div class="csv-field">
-            <label>Retirement Accounts ($)</label>
+            <label>Illiquid Investments ($)</label>
             <input type="number" id="retirement_accounts" placeholder="0" />
-        </div>
-        <div class="csv-field">
-            <label>Credit Score</label>
-            <input type="number" id="credit_score" placeholder="680" min="300" max="850" />
         </div>
         <div class="csv-field">
             <label>Debt-to-Income Ratio</label>
@@ -155,36 +151,46 @@
     <div class="section-header">
         <span class="section-num">02</span>
         <h2 class="section-title">Economic Climate</h2>
-        <!-- !!!!!!!!!! via Yahoo Finance — Phase 2 !!!!! -->
+        <span class="tag" style="margin-left: auto; font-size: 0.65rem;">Real-time Data</span>
     </div>
 
-    <!-- !!!! The following are placeholders, fill in with actual data  !!!! -->
-    <div class="indicators-grid">
-        <div class="indicator-card">
-            <div class="indicator-name">US Inflation Rate</div>
-            <div class="indicator-value" style="color: var(--score-low);">3.4%</div>
-            <div class="indicator-change change-up">▲ +0.2% MoM</div>
+    <div style="margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center;">
+        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: 'DM Mono', monospace;">Real-time indicators (auto-loaded) or enter manually</span>
+        <button class="btn btn-outline" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;" onclick="fetchMacroData()">
+            🔄 Load Real-time Data
+        </button>
+    </div>
+
+    <div class="csv-fields">
+        <div class="csv-field">
+            <label>Inflation Rate (%)</label>
+            <input type="number" id="inflation" placeholder="3.2" step="0.1" />
         </div>
-        <div class="indicator-card">
-            <div class="indicator-name">Fed Funds Rate</div>
-            <div class="indicator-value" style="color: var(--score-mid);">5.33%</div>
-            <div class="indicator-change change-neutral">— Unchanged</div>
+        <div class="csv-field">
+            <label>GDP Growth (%)</label>
+            <input type="number" id="gdp" placeholder="2.5" step="0.1" />
         </div>
-        <div class="indicator-card">
-            <div class="indicator-name">VIX (Volatility)</div>
-            <div class="indicator-value" style="color: var(--accent);">14.2</div>
-            <div class="indicator-change change-down">▼ −2.1 (Low Fear)</div>
+        <div class="csv-field">
+            <label>Consumer Confidence Index (CCI)</label>
+            <input type="number" id="cci" placeholder="104.7" step="0.1" />
         </div>
-        <div class="indicator-card">
-            <div class="indicator-name">Unemployment</div>
-            <div class="indicator-value" style="color: var(--accent);">3.7%</div>
-            <div class="indicator-change change-down">▼ −0.1% MoM</div>
+        <div class="csv-field">
+            <label>Market Performance (%)</label>
+            <input type="number" id="market_performance" placeholder="0.05" step="0.01" />
+        </div>
+    </div>
+
+    <div style="margin-top: 1rem; padding: 1rem; background: rgba(200,255,87,0.05); border-left: 3px solid var(--accent); border-radius: 4px;">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">
+            <strong>Data Sources:</strong><br/>
+            📊 FRED API (Federal Reserve) | 📈 Yahoo Finance | Default: Inflation 3.2% | GDP 2.5% | CCI 104.7 | Market 5%
+            <div id="macro-status" style="font-size: 0.75rem; margin-top: 0.5rem; display: none;">Loading...</div>
         </div>
     </div>
 </section>
- 
+
 <div class="divider"></div>
- 
+
 <!-- ─── AI ADVICE ─── -->
 <section class="page section">
     <div class="section-header">
@@ -377,7 +383,6 @@
           'total_debt': document.getElementById('total_debt'),
           'monthly_income': document.getElementById('monthly_income'),
           'monthly_expenses': document.getElementById('monthly_expenses'),
-          'emergency_fund_months': document.getElementById('emergency_fund_months'),
           'investment_accounts': document.getElementById('investment_accounts'),
           'retirement_accounts': document.getElementById('retirement_accounts'),
           'credit_score': document.getElementById('credit_score'),
@@ -405,6 +410,50 @@
       dropZone.querySelector('.upload-title').textContent = 'Drop CSV here or click';
     });
   }
+
+  // Fetch real-time macro data from FRED and Yahoo Finance APIs
+  function fetchMacroData() {
+    const statusDiv = document.getElementById('macro-status');
+    statusDiv.style.display = 'block';
+    statusDiv.textContent = '⏳ Fetching real-time economic data...';
+
+    fetch('/api/fetch-macro-data')
+      .then(response => response.json())
+      .then(result => {
+        if (result.success && result.data) {
+          // Populate macro fields with fetched data
+          if (result.data.inflation !== undefined && result.data.inflation !== null) {
+            document.getElementById('inflation').value = result.data.inflation;
+          }
+          if (result.data.gdp !== undefined && result.data.gdp !== null) {
+            document.getElementById('gdp').value = result.data.gdp;
+          }
+          if (result.data.cci !== undefined && result.data.cci !== null) {
+            document.getElementById('cci').value = result.data.cci;
+          }
+          if (result.data.market_performance !== undefined && result.data.market_performance !== null) {
+            document.getElementById('market_performance').value = result.data.market_performance;
+          }
+
+          // Display status message
+          let additionalInfo = '';
+          if (result.data.vix) additionalInfo += ` | VIX: ${result.data.vix}`;
+          if (result.data.unemployment_rate) additionalInfo += ` | Unemployment: ${result.data.unemployment_rate}%`;
+          if (result.data.fed_funds_rate) additionalInfo += ` | Fed Rate: ${result.data.fed_funds_rate}%`;
+
+          statusDiv.innerHTML = `✅ ${result.message}${additionalInfo}`;
+          statusDiv.style.color = 'var(--accent)';
+        } else {
+          statusDiv.textContent = `⚠️ ${result.message}`;
+          statusDiv.style.color = 'var(--text-muted)';
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching macro data:', error);
+        statusDiv.textContent = '❌ Failed to fetch real-time data: ' + error.message;
+        statusDiv.style.color = 'var(--score-low)';
+      });
+  }
  
   // Tab switching
   document.querySelectorAll('.tab').forEach(tab => {
@@ -422,11 +471,15 @@
       total_debt: parseFloat(document.getElementById('total_debt').value) || 0,
       monthly_income: parseFloat(document.getElementById('monthly_income').value) || 0,
       monthly_expenses: parseFloat(document.getElementById('monthly_expenses').value) || 0,
-      emergency_fund_months: parseFloat(document.getElementById('emergency_fund_months').value) || 0,
       investment_accounts: parseFloat(document.getElementById('investment_accounts').value) || 0,
       retirement_accounts: parseFloat(document.getElementById('retirement_accounts').value) || 0,
       credit_score: parseInt(document.getElementById('credit_score').value) || 600,
-      debt_to_income_ratio: parseFloat(document.getElementById('debt_to_income_ratio').value) || 0
+      debt_to_income_ratio: parseFloat(document.getElementById('debt_to_income_ratio').value) || 0,
+      // Macro indicators (optional, uses defaults if empty)
+      inflation: parseFloat(document.getElementById('inflation').value) || 3.2,
+      gdp: parseFloat(document.getElementById('gdp').value) || 2.5,
+      cci: parseFloat(document.getElementById('cci').value) || 104.7,
+      market_performance: parseFloat(document.getElementById('market_performance').value) || 0.05
     };
 
     // Show loading state
