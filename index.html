@@ -298,7 +298,6 @@
     <div class="section-header">
         <span class="section-num">05</span>
         <h2 class="section-title">Auto-Connect Your Accounts</h2>
-        <span class="tag" style="margin-left: auto; font-size: 0.65rem;">Phase 4 — Plaid</span>
     </div>
 
     <div class="connect-banner">
@@ -307,7 +306,7 @@
             <p>Connect your bank, investment, and credit accounts via Plaid for automatic, real-time updates to your Recession Readiness Score.</p>
             <div style="margin-top: 1rem;">
             <button class="btn btn-primary" style="opacity: 0.5; cursor: not-allowed; font-size: 0.82rem;" disabled>
-                🔗 Connect with Plaid *Update functionality in phase 4*
+                🔗 Connect with Plaid *Functionality coming to a future near you*
             </button>
         </div>
     </div>
@@ -364,7 +363,13 @@
     });
   });
 
-  function updateScore(score) {
+function saveScore(score, tier) {
+  const history = JSON.parse(localStorage.getItem('scoreHistory') || '[]');
+  history.push({ date: new Date().toLocaleDateString(), score, tier });
+  localStorage.setItem('scoreHistory', JSON.stringify(history));
+}
+
+function updateScore(score) {
   const pct = (score / 1000) * 100;
   document.querySelector('.score-bar-fill').style.width = pct + '%';
   document.querySelector('.score-number').innerHTML = 
