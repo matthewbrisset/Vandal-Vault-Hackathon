@@ -198,29 +198,30 @@
     <div class="advice-grid">
         <div class="advice-card featured">
             <div class="advice-priority priority-high">🔴 High Priority</div>
-            <div class="advice-title">*Temp*</div>
             <div class="advice-body">
-                *Temp*
+                <ul id="high-priority-list" style="list-style: disc; margin: 0; padding-left: 1.5rem;">
+                    <li>Loading...</li>
+                </ul>
+            </div>
         </div>
-        <div class="advice-action">*Temp*</div>
-    </div>
 
-    <div class="advice-card">
-        <div class="advice-priority priority-med">🟡 Medium Priority</div>
-        <div class="advice-title">*Temp*</div>
-        <div class="advice-body">
-            *Temp*
+        <div class="advice-card">
+            <div class="advice-priority priority-med">🟡 Medium Priority</div>
+            <div class="advice-body">
+                <ul id="medium-priority-list" style="list-style: disc; margin: 0; padding-left: 1.5rem;">
+                    <li>Loading...</li>
+                </ul>
+            </div>
         </div>
-        <div class="advice-action">*Temp*</div>
-    </div>
 
-    <div class="advice-card">
-        <div class="advice-priority priority-low">🟢 Looking Good</div>
-        <div class="advice-title">*Temp*</div>
-        <div class="advice-body">
-                *Temp*
+        <div class="advice-card">
+            <div class="advice-priority priority-low">🟢 Looking Good</div>
+            <div class="advice-body">
+                <ul id="looking-good-list" style="list-style: disc; margin: 0; padding-left: 1.5rem;">
+                    <li>Loading...</li>
+                </ul>
+            </div>
         </div>
-        <div class="advice-action">*Temp*</div>
     </div>
 </section>
  
@@ -495,10 +496,45 @@
         // Update score display
         updateScore(result.score);
         
-        // Update advice section
-        const adviceBody = document.querySelector('.advice-card .advice-body');
-        if (adviceBody) {
-          adviceBody.textContent = result.advice;
+        // Parse AI-generated advice by priority level
+        const advice = result.advice || '';
+        
+        // Extract sections using regex
+        const highMatch = advice.match(/HIGH PRIORITY:([\s\S]*?)(?=MEDIUM PRIORITY:|$)/i);
+        const mediumMatch = advice.match(/MEDIUM PRIORITY:([\s\S]*?)(?=LOOKING GOOD:|$)/i);
+        const goodMatch = advice.match(/LOOKING GOOD:([\s\S]*?)$/i);
+        
+        // Parse bullet points from each section
+        const parseBullets = (text) => {
+          if (!text) return [];
+          return text
+            .split('\n')
+            .filter(line => line.trim())
+            .filter(line => /^[-•*]\s/.test(line.trim()))
+            .slice(0, 3)
+            .map(line => line.replace(/^[-•*]\s*/, '').trim());
+        };
+        
+        const highPriority = parseBullets(highMatch ? highMatch[1] : '');
+        const mediumPriority = parseBullets(mediumMatch ? mediumMatch[1] : '');
+        const lookingGood = parseBullets(goodMatch ? goodMatch[1] : '');
+        
+        // Populate high priority
+        const highList = document.getElementById('high-priority-list');
+        if (highList) {
+          highList.innerHTML = highPriority.map(item => `<li>${item}</li>`).join('');
+        }
+        
+        // Populate medium priority
+        const mediumList = document.getElementById('medium-priority-list');
+        if (mediumList) {
+          mediumList.innerHTML = mediumPriority.map(item => `<li>${item}</li>`).join('');
+        }
+        
+        // Populate looking good
+        const goodList = document.getElementById('looking-good-list');
+        if (goodList) {
+          goodList.innerHTML = lookingGood.map(item => `<li>${item}</li>`).join('');
         }
         
         alert(`✅ Data saved! Your Score: ${result.score}/1000`);

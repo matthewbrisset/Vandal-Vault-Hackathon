@@ -65,7 +65,23 @@ FINANCIAL PROFILE:
                 else:
                     prompt += f"- {key.replace('_', ' ').title()}: {value}\n"
         
-        prompt += "\nProvide 3-5 specific, actionable recommendations to improve their financial resilience during economic downturns."
+        prompt += """
+Provide financial advice in the following EXACT format with exactly 3 bullet points per category:
+
+HIGH PRIORITY:
+- [Critical action 1]
+- [Critical action 2]
+- [Critical action 3]
+
+MEDIUM PRIORITY:
+- [Important action 1]
+- [Important action 2]
+- [Important action 3]
+
+LOOKING GOOD:
+- [Strength to maintain 1]
+- [Strength to maintain 2]
+- [Strength to maintain 3]"""
         
         return prompt
     
