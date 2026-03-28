@@ -74,8 +74,8 @@ def calculate_macro_multiplier(inflation: float, gdp: float, cci: float, market:
 
 def calculate_resilience_score(
     total_savings, total_debt, monthly_income, monthly_expenses, credit_score,
-    investment_accounts=0, retirement_accounts=0, debt_to_income_ratio=None,
-    inflation=3.2, gdp=2.5, cci=104.7, market_performance=0.05
+    investment_accounts, retirement_accounts, debt_to_income_ratio,
+    inflation, gd, cci, market_performance
 ):
     if debt_to_income_ratio is None:
         debt_to_income_ratio = total_debt / monthly_income if monthly_income > 0 else 10
