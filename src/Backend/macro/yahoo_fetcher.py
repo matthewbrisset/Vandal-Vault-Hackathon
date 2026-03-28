@@ -1,7 +1,7 @@
 # src/Backend/macro/yahoo_fetcher.py
 import yfinance as yf
 from datetime import datetime
-from macro.cache import ttl_cache
+from .cache import ttl_cache
 
 @ttl_cache(key="yahoo")
 def fetch_yahoo_indicators() -> dict:

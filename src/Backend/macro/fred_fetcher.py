@@ -2,7 +2,7 @@
 import os
 import requests
 from datetime import datetime
-from macro.cache import ttl_cache
+from .cache import ttl_cache
 from dotenv import load_dotenv
 
 load_dotenv()

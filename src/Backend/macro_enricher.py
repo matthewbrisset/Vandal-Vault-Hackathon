@@ -1,7 +1,7 @@
 # src/Backend/macro_enricher.py
-from macro.yahoo_fetcher import fetch_yahoo_indicators
-from macro.fred_fetcher import fetch_fred_indicators
-from macro.normalizer import calculate_macro_risk
+from .macro.yahoo_fetcher import fetch_yahoo_indicators
+from .macro.fred_fetcher import fetch_fred_indicators
+from .macro.normalizer import calculate_macro_risk
 
 def get_macro_context() -> tuple[float, str]:
     """

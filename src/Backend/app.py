@@ -15,8 +15,9 @@ try:
     from src.Backend.macro.yahoo_fetcher import fetch_yahoo_indicators
     from src.Backend.macro.fred_fetcher import fetch_fred_indicators
     MACRO_AVAILABLE = True
-except (ImportError, ModuleNotFoundError) as e:
-    print(f"⚠️  Macro data fetchers not fully configured: {e}")
+    print("✅ Macro data fetchers successfully imported!")
+except Exception as e:
+    print(f"⚠️  Macro data fetchers not available: {type(e).__name__}: {e}")
     MACRO_AVAILABLE = False
 
 # Get the project root directory (where index.html is located)
