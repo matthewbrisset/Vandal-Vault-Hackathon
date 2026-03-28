@@ -13,6 +13,8 @@ A financial advisory tool that calculates your recession readiness score (1-1000
 ### Setup (Windows)
 ```powershell
 .\setup.ps1
+If you run into permission issues, use
+powershell -ExecutionPolicy Bypass -File .\setup.ps1
 ```
 
 ### Setup (macOS/Linux)
