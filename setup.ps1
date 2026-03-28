@@ -27,7 +27,11 @@ if ($LASTEXITCODE -eq 0) {
     
     Write-Host ""
     Write-Host "Setup complete!"
-    Write-Host "Next: Add GROQ_API_KEY to .env and run pytest tests/test_user_advice_generator.py -v -s"
+    Write-Host "Next steps:"
+    Write-Host "  1. Add GROQ_API_KEY to .env"
+    Write-Host "  2. Run tests: pytest tests/ -v"
+    Write-Host "  3. Start Flask server: python -m src.Backend.app"
+    Write-Host "  4. Open http://localhost:5000 in your browser"
     Write-Host ""
 } else {
     Write-Host "Python not found. Install Python 3.9+ first."

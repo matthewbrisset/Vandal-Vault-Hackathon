@@ -104,44 +104,44 @@
     <div class="csv-fields">
         <div class="csv-field">
             <label>Monthly Income ($)</label>
-            <input type="number" placeholder="5000" />
+            <input type="number" id="monthly_income" placeholder="5000" />
         </div>
         <div class="csv-field">
             <label>Monthly Expenses ($)</label>
-            <input type="number" placeholder="3200" />
+            <input type="number" id="monthly_expenses" placeholder="3200" />
         </div>
         <div class="csv-field">
             <label>Emergency Fund (months)</label>
-            <input type="number" placeholder="4" />
+            <input type="number" id="emergency_fund_months" placeholder="4" />
         </div>
         <div class="csv-field">
             <label>Total Debt ($)</label>
-            <input type="number" placeholder="18000" />
+            <input type="number" id="total_debt" placeholder="18000" />
         </div>
         <div class="csv-field">
             <label>Savings ($)</label>
-            <input type="number" placeholder="12000" />
+            <input type="number" id="total_savings" placeholder="12000" />
         </div>
         <div class="csv-field">
             <label>Investment Portfolio ($)</label>
-            <input type="number" placeholder="25000" />
+            <input type="number" id="investment_accounts" placeholder="25000" />
         </div>
         <div class="csv-field">
-            <label>Job Security (1–10)</label>
-            <input type="number" placeholder="7" min="1" max="10" />
+            <label>Retirement Accounts ($)</label>
+            <input type="number" id="retirement_accounts" placeholder="0" />
         </div>
         <div class="csv-field">
-            <label>Liquid Assets ($)</label>
-            <input type="number" placeholder="8000" />
+            <label>Credit Score</label>
+            <input type="number" id="credit_score" placeholder="680" min="300" max="850" />
         </div>
         <div class="csv-field">
-            <label>Monthly Debt Payments ($)</label>
-            <input type="number" placeholder="450" />
+            <label>Debt-to-Income Ratio</label>
+            <input type="number" id="debt_to_income_ratio" placeholder="0.4" step="0.01" />
         </div>
         </div>
 
         <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
-        <button class="btn btn-primary" style="font-size: 0.85rem;">
+        <button class="btn btn-primary" style="font-size: 0.85rem;" id="submitBtn" onclick="submitFinancialData(this)">
             ⚡ Calculate My Score
         </button>
         <button class="btn btn-outline" style="font-size: 0.85rem;">Download CSV Template</button>
@@ -298,6 +298,7 @@
     <div class="section-header">
         <span class="section-num">05</span>
         <h2 class="section-title">Auto-Connect Your Accounts</h2>
+        <span class="tag" style="margin-left: auto; font-size: 0.65rem;">Phase 4 — Plaid</span>
     </div>
 
     <div class="connect-banner">
@@ -306,7 +307,7 @@
             <p>Connect your bank, investment, and credit accounts via Plaid for automatic, real-time updates to your Recession Readiness Score.</p>
             <div style="margin-top: 1rem;">
             <button class="btn btn-primary" style="opacity: 0.5; cursor: not-allowed; font-size: 0.82rem;" disabled>
-                🔗 Connect with Plaid *Functionality coming to a future near you*
+                🔗 Connect with Plaid *Update functionality in phase 4*
             </button>
         </div>
     </div>
@@ -363,13 +364,60 @@
     });
   });
 
-function saveScore(score, tier) {
-  const history = JSON.parse(localStorage.getItem('scoreHistory') || '[]');
-  history.push({ date: new Date().toLocaleDateString(), score, tier });
-  localStorage.setItem('scoreHistory', JSON.stringify(history));
-}
+  // Submit financial data to backend and write to CSV
+  function submitFinancialData(btn) {
+    const data = {
+      user_id: "user_" + Math.random().toString(36).substr(2, 9),
+      total_savings: parseFloat(document.getElementById('total_savings').value) || 0,
+      total_debt: parseFloat(document.getElementById('total_debt').value) || 0,
+      monthly_income: parseFloat(document.getElementById('monthly_income').value) || 0,
+      monthly_expenses: parseFloat(document.getElementById('monthly_expenses').value) || 0,
+      emergency_fund_months: parseFloat(document.getElementById('emergency_fund_months').value) || 0,
+      investment_accounts: parseFloat(document.getElementById('investment_accounts').value) || 0,
+      retirement_accounts: parseFloat(document.getElementById('retirement_accounts').value) || 0,
+      credit_score: parseInt(document.getElementById('credit_score').value) || 600,
+      debt_to_income_ratio: parseFloat(document.getElementById('debt_to_income_ratio').value) || 0
+    };
 
-function updateScore(score) {
+    // Show loading state
+    const originalText = btn.textContent;
+    btn.textContent = "⏳ Calculating...";
+    btn.disabled = true;
+
+    // Send to Flask API
+    fetch('/api/calculate-score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+      if (result.success) {
+        // Update score display
+        updateScore(result.score);
+        
+        // Update advice section
+        const adviceBody = document.querySelector('.advice-card .advice-body');
+        if (adviceBody) {
+          adviceBody.textContent = result.advice;
+        }
+        
+        alert(`✅ Data saved! Your Score: ${result.score}/1000`);
+      } else {
+        alert('❌ Error: ' + result.error);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('❌ Failed to submit data: ' + error.message);
+    })
+    .finally(() => {
+      btn.textContent = originalText;
+      btn.disabled = false;
+    });
+  }
+
+  function updateScore(score) {
   const pct = (score / 1000) * 100;
   document.querySelector('.score-bar-fill').style.width = pct + '%';
   document.querySelector('.score-number').innerHTML = 
