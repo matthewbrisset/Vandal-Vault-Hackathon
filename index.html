@@ -46,10 +46,12 @@
     <!-- Right: Score Card -->
     <div id="score">
         <div class="score-card">
-        <div class="score-label">Your *SHART Score</div>
-        <div class="score-label">*(Savings Health and Ressession Threat)</div>
-        <div class="score-number">1000<span class="score-max">/1000</span></div>
- 
+        <div class="score-label">Your SHART Score</div>
+<!--        <div class="score-number">1000<span class="score-max">/1000</span></div> -->
+        <div class="score-number" id="hero-score-number">
+          <span style="font-size:2.5rem; color: var(--text-muted);">—</span>
+          <span class="score-max" style="color: var(--text-muted);">/1000</span>
+        </div> 
         <div style="margin-top: 1.25rem;">
           <div class="score-bar-wrap">
             <!-- The fill width will be set dynamically via JavaScript based on the score -->
@@ -60,12 +62,17 @@
             <span>1000 — Excellent</span>
           </div>
         </div>
- 
+        <!-- new version for updating 
+      <div class="score-delta">
+        <span class="delta-up" id="hero-delta">—</span>
+        <span class="delta-label" id="hero-delta-label">no previous assessment</span>
+      </div>
+    --><!-- delete if we get it to work
         <div class="score-delta">
           <span class="delta-up">▲ -+__ pts</span>
           <span class="delta-label">from last assessment (___ __/__/____)</span>
         </div>
- 
+      -->
       </div>
     </div>
   </div>
@@ -609,7 +616,26 @@ function setIndicator(key, value, unit, baseline, higherIsBetter) {
       .then(result => {
         if (result.success && result.data && result.data.length > 0) {
           const data = result.data;
-          
+        /* // this section had wierd errors, will revisit if time allows but priority is to get basic functionality working
+        // ── Update hero score delta ──
+        const sorted = [...data].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const deltaEl = document.getElementById('hero-delta');
+        const deltaLabelEl = document.getElementById('hero-delta-label');
+        if (sorted.length >= 2) {
+          const change = sorted[0].score - sorted[1].score;
+          const sign = change >= 0 ? '▲ +' : '▼ ';
+          const color = change >= 0 ? 'var(--score-good)' : 'var(--score-low)';
+          deltaEl.textContent = sign + Math.abs(change) + ' pts';
+          deltaEl.style.color = color;
+          const prevDate = new Date(sorted[1].date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+          deltaLabelEl.textContent = 'from last assessment (' + prevDate + ')';
+        } else if (sorted.length === 1) {
+          deltaEl.textContent = '—';
+          deltaEl.style.color = 'var(--text-muted)';
+          deltaLabelEl.textContent = 'no previous assessment to compare';
+        }
+        // ── end delta update ──
+*/
           // Populate chart
           const chartPlaceholder = document.getElementById('chart-placeholder');
           const chartBars = chartPlaceholder.querySelectorAll('.chart-bar');
