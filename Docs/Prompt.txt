@@ -1,0 +1,11 @@
+Goals:
+Functional
+Fully addresses theme
+Real World app
+Completed project
+~Passion
+
+Prompt: Financial Solutions
+
+Twist: The tool must be designed specifically to help users survive an economic crash or period of high inflation.
+Managing money, forsee when it crashes, cutting costs, etc.
